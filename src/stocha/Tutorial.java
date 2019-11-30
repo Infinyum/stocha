@@ -9,7 +9,7 @@ import ilog.cplex.*;
 public class Tutorial {
 	
 	public static void main(String[] args) {
-		Example2.solveMe();
+		TSP.solveMe(25);
 	}
 	
 }
