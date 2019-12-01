@@ -14,6 +14,7 @@ public class MyMain {
 		
 		
 		//VLSwithCPLEX.solveMe(n, c, v, w, k, E);
-		ScenarioFactory scenarioFactory = new ScenarioFactory(5, 3);
+		ScenarioFactory scenarioFactory = new ScenarioFactory(5, 3, k);
+		System.out.println(scenarioFactory);
 	}
 }
