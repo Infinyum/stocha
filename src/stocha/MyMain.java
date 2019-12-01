@@ -13,6 +13,7 @@ public class MyMain {
 		         	{ 4, 3, 0}};
 		
 		
-		VLSwithCPLEX.solveMe(n, c, v, w, k, E);
+		//VLSwithCPLEX.solveMe(n, c, v, w, k, E);
+		ScenarioFactory scenarioFactory = new ScenarioFactory(5, 3);
 	}
 }
