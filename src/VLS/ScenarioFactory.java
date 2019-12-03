@@ -10,24 +10,27 @@ import java.util.Random;
 public class ScenarioFactory {
 	Map<Double, Integer[][]> scenarios;
 
-	public ScenarioFactory(int S, int n, int[] k) {
+	public ScenarioFactory(int S, List<Station> stations) {
 		this.scenarios = new HashMap<Double, Integer[][]>();
+		
 		// Generate S random numbers whose sum is equal to 1
 		List<Double> probabilities = n_random(1d, S);
 		
+		int n = stations.size();
+		Random r = new Random();
 		// Generate a random demand matrix for each scenario
 		for (int s = 0 ; s < S ; s++) {
 			Integer[][] demand = new Integer[n][n];
-			Random r = new Random();
+			
 			for (int i = 0 ; i < n ; i++) {
 				for (int j = 0 ; j < n ; j++) {
 					// Diagonal values equal to 0
 					if (i == j) {
 						demand[i][j] = 0;
 					}
+					// Generate a random value between 0 and twice the total capacity of the bike station 
 					else {
-						// Generate a random value between 0 and twice the total capacity of the bike station 
-						demand[i][j] = r.nextInt(2*k[j]); 
+						demand[i][j] = r.nextInt(2*stations.get(j).getK() + 1); 
 					}
 				}
 			}
@@ -61,14 +64,5 @@ public class ScenarioFactory {
 
 	public Map<Double, Integer[][]> getScenarios() {
 		return scenarios;
-	}
-
-	@Override
-	public String toString() {
-		String s = new String("Scenarios:\n");
-		for (Map.Entry<Double, Integer[][]> entry : scenarios.entrySet()) {
-			s += "Probability: " + entry.getKey() + "\nDemand matrix:\n" + Arrays.deepToString(entry.getValue()) + "\n\n";
-		}
-		return s;
 	}	
 }

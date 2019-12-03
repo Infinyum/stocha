@@ -1,15 +1,16 @@
 package CPLEX;
 
-import java.util.stream.IntStream;
-
 import ilog.concert.*;
 import ilog.cplex.*;
+import java.util.ArrayList;
+import java.util.List;
+import VLS.Station;
 
 public class VLSwithCPLEX {
-	public static void solveMe(int n, double[] c, double[] v, double[] w, int[] k, Integer[][] E) {
-
+	public static void solveMe(List<Station> stations, Integer[][] E) {		
 		try {	
 			IloCplex cplex = new IloCplex();
+			int n = stations.size();
 			
 			// DECISION VARIABLES
 			IloNumVar[] x = cplex.numVarArray(n, 0, Double.MAX_VALUE);
@@ -25,21 +26,21 @@ public class VLSwithCPLEX {
 			
 			IloLinearNumExpr objective = cplex.linearNumExpr();
 			for (int i = 0 ; i < n ; i++) {
-				objective.addTerm(c[i], x[i]);
+				objective.addTerm(stations.get(i).getC(), x[i]);
 			}
 			for (int i = 0 ; i < n ; i++) {
 				IloLinearNumExpr expr = cplex.linearNumExpr();
 				for (int j = 0 ; j < n ; j++) {
-					expr.addTerm(v[i], Iminus[i][j]);
+					expr.addTerm(stations.get(i).getV(), Iminus[i][j]);
 				}
-				expr.addTerm(w[i], Ominus[i]);
+				expr.addTerm(stations.get(i).getW(), Ominus[i]);
 				objective.add(expr);
 			}
 			cplex.addMinimize(objective);
 			
 			// CONSTRAINTS
 			for (int i = 0 ; i < n ; i++) {
-				cplex.addLe(x[i], k[i]); // 1a
+				cplex.addLe(x[i], stations.get(i).getK()); // 1a
 			}
 			
 			for (int i = 0 ; i < n ; i++) {
@@ -71,7 +72,7 @@ public class VLSwithCPLEX {
 					expr.addTerm(-1.0, B[i][j]);
 					expr.addTerm(1.0, B[j][i]);
 				}
-				cplex.addEq(expr, k[i]); // 1d
+				cplex.addEq(expr, stations.get(i).getK()); // 1d
 			}
 			
 			for (int i = 0 ; i < n ; i++) {
