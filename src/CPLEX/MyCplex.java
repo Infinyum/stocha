@@ -1,4 +1,4 @@
-package stocha;
+package CPLEX;
 import ilog.concert.*;
 import ilog.cplex.*;
 

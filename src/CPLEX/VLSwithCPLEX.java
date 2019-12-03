@@ -1,4 +1,4 @@
-package stocha;
+package CPLEX;
 
 import java.util.stream.IntStream;
 
@@ -6,7 +6,7 @@ import ilog.concert.*;
 import ilog.cplex.*;
 
 public class VLSwithCPLEX {
-	public static void solveMe(int n, double[] c, double[] v, double[] w, int[] k, int[][] E) {
+	public static void solveMe(int n, double[] c, double[] v, double[] w, int[] k, Integer[][] E) {
 
 		try {	
 			IloCplex cplex = new IloCplex();
@@ -55,7 +55,10 @@ public class VLSwithCPLEX {
 					expr.addTerm(-1.0, Iminus[i][j]);
 				}
 				expr.addTerm(-1.0, x[i]);
-				int sum = IntStream.of(E[i]).sum();
+				int sum = 0;
+				for (int j = 0 ; j < n ; j++) {
+					sum += E[i][j];
+				}
 				cplex.addEq(expr, -1*sum); // 1c
 			}
 			

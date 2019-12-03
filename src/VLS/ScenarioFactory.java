@@ -1,4 +1,4 @@
-package stocha;
+package VLS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
