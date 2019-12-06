@@ -10,7 +10,7 @@ public class VariableLessExpression implements Valuable {
 		private String expressionLitteral;
 		private ScriptEngineManager mgr = new ScriptEngineManager();
 		private ScriptEngine engine = mgr.getEngineByName("JavaScript");
-		
+
 		public VariableLessExpression(String expressionLitteral) {
 			super();
 			this.expressionLitteral = expressionLitteral;
@@ -25,15 +25,19 @@ public class VariableLessExpression implements Valuable {
 		}
 		
 		@Override
-		public Object getValue() {
+		public Number getValue() {
 			try {	
-				return engine.eval(expressionLitteral);
+				return (Number)engine.eval(expressionLitteral);
 			} catch (ScriptException e) {
 				
 				return null;
 				
 			}
 		}
-
+		
+		@Override
+		public String toString() {
+			return expressionLitteral;
+		}
 		
 }
