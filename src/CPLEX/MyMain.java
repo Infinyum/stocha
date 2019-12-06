@@ -19,7 +19,7 @@ public class MyMain {
 		double[] w = {1.5, 1.9, 1.1};
 		int[] k = {10, 8, 12};*/
 		
-		/*Integer[][] E = {
+		Integer[][] E = {
 		          	{ 0, 2, 7},
 		         	{13, 0, 5},
 		         	{ 4, 3, 0}};
@@ -31,7 +31,7 @@ public class MyMain {
 		Station s3 = new Station(3, "Three", 12);
 		s3.setC(0.6); s3.setV(1.7); s3.setW(1.1);
 		List<Station> myStations = new ArrayList<>();
-		myStations.add(s1); myStations.add(s2); myStations.add(s3);*/
+		myStations.add(s1); myStations.add(s2); myStations.add(s3);
 		
 		try
         {
@@ -61,7 +61,8 @@ public class MyMain {
 			ScenarioFactory scenarioFactory = new ScenarioFactory(1, stations);
 			// Solve for each scenario
 			for (Map.Entry<Double, Integer[][]> entry : scenarioFactory.getScenarios().entrySet()) {
-				VLSwithCPLEX.solveMe(stations, entry.getValue());
+				//VLSwithCPLEX.solveMe(stations, entry.getValue());
+				VLSwithCPLEX.solveMe(myStations, E);
 			}
 			
         } catch (IOException e) {

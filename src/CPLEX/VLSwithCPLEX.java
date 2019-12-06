@@ -2,7 +2,6 @@ package CPLEX;
 
 import ilog.concert.*;
 import ilog.cplex.*;
-import java.util.ArrayList;
 import java.util.List;
 import VLS.Station;
 
@@ -13,15 +12,16 @@ public class VLSwithCPLEX {
 			int n = stations.size();
 			
 			// DECISION VARIABLES
-			IloNumVar[] x = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar[] Iplus = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar[] Ominus = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-			IloNumVar[] Oplus = cplex.numVarArray(n, 0, Double.MAX_VALUE);
+			IloNumVar[] x = cplex.numVarArray(n, 0d, Double.MAX_VALUE, IloNumVarType.Float);
+			IloNumVar[] Iplus = cplex.numVarArray(n, 0d, Double.MAX_VALUE, IloNumVarType.Float);
+			IloNumVar[] Ominus = cplex.numVarArray(n, 0d, Double.MAX_VALUE, IloNumVarType.Float);
+			IloNumVar[] Oplus = cplex.numVarArray(n, 0d, Double.MAX_VALUE, IloNumVarType.Float);
 			IloNumVar[][] B = new IloNumVar[n][];
 			IloNumVar[][] Iminus = new IloNumVar[n][];
+			
 			for (int i = 0 ; i < n ; i++) {
-				B[i] = cplex.numVarArray(n, 0, Double.MAX_VALUE);
-				Iminus[i] = cplex.numVarArray(n, 0, Double.MAX_VALUE);
+				B[i] = cplex.numVarArray(n, 0d, Double.MAX_VALUE, IloNumVarType.Float);
+				Iminus[i] = cplex.numVarArray(n, 0d, Double.MAX_VALUE, IloNumVarType.Float);
 			}
 			
 			IloLinearNumExpr objective = cplex.linearNumExpr();
@@ -83,11 +83,12 @@ public class VLSwithCPLEX {
 			// SOLVE AND DISPLAY
 			cplex.setParam(IloCplex.IntParam.Simplex.Display, 0);
 			
+			
 			if (cplex.solve()) {
 				System.out.println("solution with objective = " + cplex.getObjValue());
 				System.out.print("x = [");
 				for (int i = 0 ; i < n ; i++) {					
-					System.out.print((int)cplex.getValue(x[i]) + (i == (n-1) ? "" : ","));
+					System.out.print(cplex.getValue(x[i]) + (i == (n-1) ? "" : ","));
 				}
 				System.out.println("]");
 				
