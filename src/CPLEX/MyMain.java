@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.json.*;
 
+import VLS.Scenario;
 import VLS.ScenarioFactory;
 import VLS.Station;
 
@@ -60,8 +61,9 @@ public class MyMain {
 			
 			ScenarioFactory scenarioFactory = new ScenarioFactory(1, stations);
 			// Solve for each scenario
-			for (Map.Entry<Double, Integer[][]> entry : scenarioFactory.getScenarios().entrySet()) {
-				//VLSwithCPLEX.solveMe(stations, entry.getValue());
+			//for (Map.Entry<Double, Integer[][]> entry : scenarioFactory.getScenarios().entrySet()) {
+			for (Scenario s : scenarioFactory.getScenarios()) {
+				//VLSwithCPLEX.solveMe(stations, s.getDemandMatrix());
 				VLSwithCPLEX.solveMe(myStations, E);
 			}
 			

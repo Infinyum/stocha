@@ -1,15 +1,14 @@
 package VLS;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import Model.Recuit;
 
 public class VLSSolver {
@@ -17,15 +16,15 @@ public class VLSSolver {
 		// RECUIT SETTINGS
 		double temperatureInit = 40d;
 		double coef = 0.9d;
+		double alpha = 1.1d;
 		double epsilon = 1E-3;
-		//int nbPaliers = stations.size() * 2;
-		int nbPaliers = 1000;
-		int nbRounds = 1; // Number of times penalty applied
-		int nbScenarios = 1;
+		int nbIter = 1000;
+		int nbRounds = 10; // Number of times penalty applied
+		int S = 5;
 		
 		
 		// CUSTOM EXAMPLE
-		Integer[][] E = {
+		/*Integer[][] E = {
 		      	{ 0, 2, 7},
 		     	{13, 0, 5},
 		     	{ 4, 3, 0}};
@@ -40,10 +39,7 @@ public class VLSSolver {
 		myStations.add(s1); myStations.add(s2); myStations.add(s3);
 		
 		List<Integer> Xinit = new ArrayList<>();
- 		Xinit.add(5); Xinit.add(4); Xinit.add(6);
- 		VLSNeighbourhood neighbourhood = new VLSNeighbourhood(myStations);
- 		VLSConstraints constraints = new VLSConstraints(myStations, E);
-		VLSTargetFunction objective = new VLSTargetFunction(myStations, E);
+ 		Xinit.add(5); Xinit.add(4); Xinit.add(6);*/
 		// END CUSTOM EXAMPLE
 		
 		
@@ -57,14 +53,14 @@ public class VLSSolver {
 		int code, k;
 		String name;
 		List<Station> stations = new ArrayList<>();
-		//List<Integer> Xinit = new ArrayList<>();
+		List<Integer> Xinit = new ArrayList<>();
 		
 		// CREATING STATION OBJECTS
-		for (int i = 0; i < 50/*arr.length()*/; i++)
+		for (int i = 0; i < 20/*arr.length()*/; i++)
 		{
 			k = arr.getJSONObject(i).getJSONObject("fields").getInt("nbedock");
 			// Initial solution: stations are filled halfway
-			//Xinit.add((int)Math.round(k/2.0));
+			Xinit.add((int)Math.round(k/2.0));
 			
 			JSONObject stationJson = new JSONObject(arr.getJSONObject(i).getJSONObject("fields").getString("station"));
 			code = stationJson.getInt("code");
@@ -73,34 +69,85 @@ public class VLSSolver {
 		    stations.add(new Station(code, name, k));
 		}
 		
-		//VLSNeighbourhood neighbourhood = new VLSNeighbourhood(stations);
+		int n = stations.size();
+
+		// Penalty variables
+		List<Double> phi = new ArrayList<>();
+		List<Double> lambda = new ArrayList<>();
+		List<Integer> Xbarre = new ArrayList<>();
+		for (int i = 0 ; i < n ; i++) {
+			phi.add(stations.get(i).getC() / 2d);
+			lambda.add(0d);
+		}
 		
+		VLSNeighbourhood neighbourhood = new VLSNeighbourhood(stations);
+		List<Scenario> scenarios = new ScenarioFactory(S, stations).getScenarios();
 		
-		//VLSTargetFunction objective = new VLSTargetFunction(stations, entry.getValue());
-		//VLSConstraints constraints = new VLSConstraints(stations, entry.getValue());
-		ScenarioFactory scenarioFactory = new ScenarioFactory(nbScenarios, stations);
-		Recuit myRecuit = new Recuit(temperatureInit, coef, epsilon, nbPaliers, objective, neighbourhood, constraints);
-		//List<List<Integer>> subSolutions = new ArrayList<>();
+		// Initialize sous-recuits
+		for (Scenario s : scenarios) {
+			VLSConstraints constraints = new VLSConstraints(stations, s.getDemandMatrix());
+			VLSTargetFunction objective = new VLSTargetFunction(stations, s.getDemandMatrix());
+			
+			s.setRecuit(new Recuit(temperatureInit, coef, epsilon, nbIter, objective, neighbourhood, constraints, Xinit));
+			s.getRecuit().getObjective().setLambda(new ArrayList<Double>(lambda));
+			s.getRecuit().getObjective().setPhi(phi);
+		}
+		
 		
 		int round = 0;
 		
 		while (round < nbRounds) {
-			// SOLVE FOR EACH SCENARIO
-			for (Map.Entry<Double, Integer[][]> entry : scenarioFactory.getScenarios().entrySet()) {
-				// UPDATE OBJECTIVE AND CONSTRAINTS FOR THIS SCENARIO
-				/*objective.setDemandMatrix(entry.getValue());
-				myRecuit.setObjective(objective);
-				constraints.setDemandMatrix(entry.getValue());
-				myRecuit.setConstraints(constraints);*/
-
-				List<Integer> subSol = myRecuit.solveMe(Xinit);
-				System.out.println("X = " + subSol);
+			Xbarre.clear();
+			// Compute Xbarre
+			double temp = 0d;
+			for (int i = 0 ; i < n ; i++) {
+				Xbarre.add(0);
+				temp = 0d;
+				for (Scenario s : scenarios) {
+					temp += s.getProbability() * s.getRecuit().getSolution().get(i);
+				}
+				Xbarre.set(i, (int)Math.round(temp));
 			}
 			
-			// TODO: penalite pour chaque sous-recuit puis repartir pour une nouvelle iteration
-			// ...
+			// SOLVE FOR EACH SCENARIO			
+			for (Scenario s : scenarios) {
+				s.getRecuit().getObjective().setXbarre(Xbarre);
+				
+				// No need to update for the first round (already initialized)
+				if (round > 0) {
+					// Update phi and lambda in the target function
+					s.getRecuit().getObjective().update(phi, s.getRecuit().getSolution());
+				}
+				
+				s.getRecuit().solveMe();
+			}
+
+			// Update phi
+			for (int i = 0 ; i < n ; i++) {
+				phi.set(i, alpha * phi.get(i));
+			}		
 			
 			round++;
 		}
+		
+		// Compute Xfinal and objFinal
+		List<Integer> Xfinal = new ArrayList<>();
+		double temp = 0d;
+		for (int i = 0 ; i < n ; i++) {
+			Xfinal.add(0);
+			temp = 0d;
+			for (Scenario s : scenarios) {
+				temp += s.getProbability() * s.getRecuit().getSolution().get(i);
+			}
+			Xfinal.set(i, (int)Math.round(temp));
+		}
+		
+		Double objFinal = new Double(0d);
+		for (Scenario s : scenarios) {			
+			objFinal += s.getProbability() * s.getRecuit().getObjectiveValue();
+		}
+		
+		System.out.println("Solution = " + BigDecimal.valueOf(objFinal).setScale(1, RoundingMode.HALF_UP).doubleValue());
+		System.out.println(Xfinal);
 	}
 }

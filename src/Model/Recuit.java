@@ -14,34 +14,39 @@ public class Recuit {
 	double temperature;
 	double coef;
 	double epsilon;
-	int nbPaliers;
+	int nbIter;
+	List<Integer> X;
+	Double objectiveValue;
 	VLSTargetFunction objective;
 	VLSNeighbourhood neighbourhood;
 	VLSConstraints constraints;
 	
-	public Recuit(double temperature, double coef, double eps, int nbPaliers, VLSTargetFunction obj, VLSNeighbourhood nbr, VLSConstraints cstr) {
+	public Recuit(double temperature, double coef, double eps, int nbIter, VLSTargetFunction obj, VLSNeighbourhood nbr, VLSConstraints cstr, List<Integer> Xinit) {
 		this.temperature = temperature;
 		this.coef = coef;
 		this.epsilon = eps;
-		this.nbPaliers = nbPaliers;
+		this.nbIter = nbIter;
 		this.objective = obj;
 		this.neighbourhood = nbr;
 		this.constraints = cstr;
+		this.X = Xinit;
+		objectiveValue = null;
 	}
 	
-	public List<Integer> solveMe(List<Integer> X) {
-		List<Integer> Xmeilleur = X;
+	public void solveMe() {
+		List<Integer> Xmeilleur = this.X;
 		List<Integer> Xprime = new ArrayList<>();
 		
-		double fmin = this.objective.compute(X);
+		double fmin = this.objective.compute(Xmeilleur);
 		double t = this.temperature;
 		double delta = 0d;
 		double objectiveX = 0d;
 		int acceptes = 0, engendres = 0;
+		Random r = new Random();
 		
 		do {
 			int i = 0;
-			while (i < nbPaliers) {
+			while (i < nbIter) {
 				objectiveX = this.objective.compute(X);
 				Xprime = neighbourhood.compute(X);
 				
@@ -58,7 +63,7 @@ public class Recuit {
 					}
 					else {
 						engendres++;
-						double p = (new Random()).nextDouble();
+						double p = r.nextDouble();
 						if (p <= Math.exp(-1*delta/t)) {
 							acceptes++;
 							X = Xprime;
@@ -72,19 +77,25 @@ public class Recuit {
 			t = this.coef * t;
 			
 		} while (t > epsilon);
-				
+		
 		double tauxAcceptation = (acceptes / (double)engendres)*100;
 		System.out.println("Taux d'acceptation = " + BigDecimal.valueOf(tauxAcceptation).setScale(1, RoundingMode.HALF_UP).doubleValue());
-		System.out.println("Solution finale = " + BigDecimal.valueOf(fmin).setScale(1, RoundingMode.HALF_UP).doubleValue());
-
-		return Xmeilleur;
+		//System.out.println("Solution finale = " + BigDecimal.valueOf(fmin).setScale(1, RoundingMode.HALF_UP).doubleValue());
+		//System.out.println(Xmeilleur);
+		
+		this.X = Xmeilleur;
+		this.objectiveValue = fmin;
 	}
 
-	public void setObjective(VLSTargetFunction objective) {
-		this.objective = objective;
+	public VLSTargetFunction getObjective() {
+		return objective;
 	}
 
-	public void setConstraints(VLSConstraints constraints) {
-		this.constraints = constraints;
+	public List<Integer> getSolution() {
+		return X;
+	}
+
+	public Double getObjectiveValue() {
+		return objectiveValue;
 	}
 }

@@ -1,17 +1,14 @@
 package VLS;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 public class ScenarioFactory {
-	Map<Double, Integer[][]> scenarios;
+	List<Scenario> scenarios;
 
 	public ScenarioFactory(int S, List<Station> stations) {
-		this.scenarios = new HashMap<Double, Integer[][]>();
+		this.scenarios = new ArrayList<>();
 		
 		// Generate S random numbers whose sum is equal to 1
 		List<Double> probabilities = n_random(1d, S);
@@ -35,7 +32,7 @@ public class ScenarioFactory {
 				}
 			}
 			// At this point the demand matrix is complete
-			scenarios.put(probabilities.get(s), demand);
+			scenarios.add(new Scenario(probabilities.get(s), demand));
 		}
 	}
 	
@@ -62,7 +59,7 @@ public class ScenarioFactory {
 	    return generatedNumbers;
 	}
 
-	public Map<Double, Integer[][]> getScenarios() {
+	public List<Scenario> getScenarios() {
 		return scenarios;
-	}	
+	}
 }
