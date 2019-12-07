@@ -42,4 +42,8 @@ public enum ArithmeticOperator implements Operator{
 		}	
 	}
 	
+	public String getSymbol() {
+		return symbol;
+	}
+	
 }

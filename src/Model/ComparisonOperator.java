@@ -14,7 +14,6 @@ public enum ComparisonOperator implements Operator{
 	
 	@Override
 	public <T extends Number> double check(Valuable<T> lValue, Valuable<T> rValue) {
-		
 		switch(this) {
 			case GREATER:{
 				double v1 = lValue.getValue().doubleValue();
@@ -45,4 +44,7 @@ public enum ComparisonOperator implements Operator{
 		}	
 	}
 	
+	public String getSymbol() {
+		return symbol;
+	}
 }

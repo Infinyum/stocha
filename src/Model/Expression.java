@@ -2,9 +2,9 @@ package Model;
 
 public class Expression implements Valuable {
 
-	private Valuable lValue;
-	private Valuable rValue;
-	private Operator op;
+	protected Valuable lValue;
+	protected Valuable rValue;
+	protected Operator op;
 		
 	public Expression(Valuable lValue, Operator op, Valuable rValue) {
 		super();
@@ -38,16 +38,25 @@ public class Expression implements Valuable {
 	}
 
 	@Override
-	public Object getValue() {
+	public Number getValue() {
 		return op.check(lValue, rValue);
+	}
+
+	@Override
+	public String toString() {
+		return "(" + lValue.toString() + ")" + op.getSymbol() + "(" + rValue.toString() + ")";
 	}
 
 	public static void main(String[] args) {
 	
 		
 		Variable v = new Variable("x",3);
+		
+		// e = "50-35+2+x"
 		Expression e = new Expression(new VariableLessExpression("50-35+2"), ArithmeticOperator.PLUS,v);
+		// e2 = "e>=55"
 		Expression e2 = new Expression(e,ComparisonOperator.GREATER_EQ,new VariableLessExpression("55"));
+		System.out.println(e);
 		System.out.println(e.getValue());
 		System.out.println(e2.getValue());
 		
@@ -55,6 +64,10 @@ public class Expression implements Valuable {
 		
 		System.out.println("\n-----------------------------------\n\n"+e.getValue());
 		System.out.println(e2.getValue());
+		
+		Expression e3 = new Expression(e,ArithmeticOperator.MULT,new VariableLessExpression("14-23"));
+		
+		System.out.println(e3);
 		
 	}
 

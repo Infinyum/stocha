@@ -16,6 +16,10 @@ public class Variable<T extends Number> implements Valuable<T>{
 		this.val = val;
 	}
 	
+	public Variable copy() {
+		return new Variable(name,val);
+	}
+	
 	@Override
 	public T getValue() {
 		return val;
@@ -23,7 +27,7 @@ public class Variable<T extends Number> implements Valuable<T>{
 
 	@Override
 	public String toString() {
-		return  name + " = " + val;
+		return  name;
 	}
 
 	public static void main(String[] args) {
