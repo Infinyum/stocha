@@ -91,4 +91,8 @@ public class VLSTargetFunction {
 	public void setXbarre(List<Integer> xbarre) {
 		Xbarre = xbarre;
 	}
+
+	public List<Double> getLambda() {
+		return lambda;
+	}
 }

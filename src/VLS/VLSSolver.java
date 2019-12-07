@@ -56,7 +56,7 @@ public class VLSSolver {
 		List<Integer> Xinit = new ArrayList<>();
 		
 		// CREATING STATION OBJECTS
-		for (int i = 0; i < 20/*arr.length()*/; i++)
+		for (int i = 0; i < 10/*arr.length()*/; i++)
 		{
 			k = arr.getJSONObject(i).getJSONObject("fields").getInt("nbedock");
 			// Initial solution: stations are filled halfway
@@ -145,6 +145,12 @@ public class VLSSolver {
 		Double objFinal = new Double(0d);
 		for (Scenario s : scenarios) {			
 			objFinal += s.getProbability() * s.getRecuit().getObjectiveValue();
+			for (int i = 0 ; i < n ; i++) {
+				objFinal += s.getRecuit().getObjective().getLambda().get(i) * Xfinal.get(i);
+			}
+		}
+		for (int i = 0 ; i < n ; i++) {
+			objFinal += 0.5d * phi.get(i) * Xfinal.get(i) * Xfinal.get(i);
 		}
 		
 		System.out.println("Solution = " + BigDecimal.valueOf(objFinal).setScale(1, RoundingMode.HALF_UP).doubleValue());

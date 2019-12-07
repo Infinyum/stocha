@@ -16,9 +16,10 @@ public class VLSNeighbourhood {
 		Random r = new Random();
 		
 		for (int i = 0 ; i < X.size() ; i++) {
-			//newX.add(X.get(i) + (r.nextInt(3)-1));
+			// Add or remove one
+			newX.add(X.get(i) + (r.nextInt(3)-1));
 			// Random integer between 1 and the capacity of the bike station
-			newX.add(r.nextInt(this.stations.get(i).getK()+1));
+			//newX.add(r.nextInt(this.stations.get(i).getK()+1));
 		}
 		
 		return newX;

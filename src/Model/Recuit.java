@@ -78,8 +78,8 @@ public class Recuit {
 			
 		} while (t > epsilon);
 		
-		double tauxAcceptation = (acceptes / (double)engendres)*100;
-		System.out.println("Taux d'acceptation = " + BigDecimal.valueOf(tauxAcceptation).setScale(1, RoundingMode.HALF_UP).doubleValue());
+		//double tauxAcceptation = (acceptes / (double)engendres)*100;
+		//System.out.println("Taux d'acceptation = " + BigDecimal.valueOf(tauxAcceptation).setScale(1, RoundingMode.HALF_UP).doubleValue());
 		//System.out.println("Solution finale = " + BigDecimal.valueOf(fmin).setScale(1, RoundingMode.HALF_UP).doubleValue());
 		//System.out.println(Xmeilleur);
 		
