@@ -6,7 +6,7 @@ import java.util.Random;
 import Model.StochasticProblem;
 import Model.Variable;
 
-public class RecuitVLS {
+public class VLSRecuit {
 	
 	final int NBPalier = 50;
 	final int NBIter = 1000;
@@ -61,6 +61,7 @@ public class RecuitVLS {
 				double oldfValue = pb.f.eval();
 				
 				updateVoisinage(Xmeilleur);
+				//....
 				
 			}
 		}

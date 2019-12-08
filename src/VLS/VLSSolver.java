@@ -12,9 +12,9 @@ import org.json.JSONObject;
 import Model.Recuit;
 
 public class VLSSolver {
-	public static void main(String[] args) throws IOException {
+	public static void solve() throws IOException {
 		// RECUIT SETTINGS
-		double temperatureInit = 40d;
+		double temperatureInit = 6.4E40d;
 		double coef = 0.9d;
 		double alpha = 1.1d;
 		double epsilon = 1E-3;
@@ -155,5 +155,9 @@ public class VLSSolver {
 		
 		System.out.println("Solution = " + BigDecimal.valueOf(objFinal).setScale(1, RoundingMode.HALF_UP).doubleValue());
 		System.out.println(Xfinal);
+	}
+	
+	public static void main(String[] args) throws IOException {
+		VLSSolver.solve();
 	}
 }

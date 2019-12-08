@@ -77,7 +77,8 @@ public class VLSConstraints {
 				rhs -= demandMatrix[i][j];
 			}
 			
-			// 1c
+			// 1c => toujours faux...
+			
 			/*if (lhs != rhs) {
 				return false;
 			}*/
