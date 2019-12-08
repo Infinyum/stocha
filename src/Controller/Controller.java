@@ -12,6 +12,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.*;
@@ -69,16 +71,13 @@ public class Controller implements Initializable {
         station.setCellValueFactory(new PropertyValueFactory<>("name"));
         action.setCellValueFactory(new PropertyValueFactory<>("action"));
 
+
         //recuperer valeur precision
         demarrer.setOnAction(event -> {
-            coefNbScenario = precision.getValue()/10;
-            int nbScenarios = (int)Math.round(coefNbScenario);
-            
+            coefNbScenario=precision.getValue()/10;
             //lancer ici la simulation avec en parametre les stations
-            Double valeurFonctionObj = VLSSolver.solve((nbScenarios == 0 ? 1 : nbScenarios), stations);
-            
-            // TODO: afficher valeurFonctionObj dans l'IHM
-            
+            Double valeurFonctionObj = VLSSolver.solve((int)Math.round(coefNbScenario), stations);
+
             exporter.setDisable(false);
             ObservableList<Station> list = FXCollections.observableArrayList(stations);
             results.setItems(list);
@@ -88,31 +87,31 @@ public class Controller implements Initializable {
         exporter.setOnAction(event -> {
             final DirectoryChooser directoryChooser = new DirectoryChooser();
             File dir = directoryChooser.showDialog(null);
-            if (dir != null) {            	
-            	File filecsv = new File(dir.getAbsolutePath()+"\\results.csv");
-            	System.out.println(filecsv.getAbsolutePath());
-            	
-            	FileOutputStream fos = null;
-            	try {
-            		fos = new FileOutputStream(filecsv);
-            	} catch (FileNotFoundException e) {
-            		e.printStackTrace();
-            	}
-            	try {
-            		filecsv.createNewFile();
-            		String toCSV= listToCSV(stations);
-            		fos.write(toCSV.getBytes());
-            		fos.flush();
-            		fos.close();
-            	} catch (IOException e) {
-            		e.printStackTrace();
-            	}
+            File filecsv = new File(dir.getAbsolutePath()+"\\results.csv");
+            System.out.println(filecsv.getAbsolutePath());
+
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(filecsv);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
+            try {
+                filecsv.createNewFile();
+                String toCSV= listToCSV(stations);
+                fos.write(toCSV.getBytes());
+                fos.flush();
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         });
 
     }
 
-    public ArrayList<Station> parseCSV(String fichier) {
+    public  ArrayList<Station> parseCSV(String fichier) {
 
         ArrayList<Station> listStations = new ArrayList<Station>();
         try {
@@ -126,7 +125,7 @@ public class Controller implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Mauvais Format");
-                alert.setContentText("Le fichier doit avoir les trois colonnes ID, nom et capacité de la station !");
+                alert.setContentText("Le fichier doit avoir les trois colonnes ID, nom et capacité de la station séparer par des virgules ! \n Vérifiez le format du fichier");
 
                 alert.showAndWait();
             }else {
