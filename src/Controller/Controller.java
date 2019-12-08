@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -23,16 +24,13 @@ public class Controller implements Initializable {
 
     @FXML private Slider precision;
     @FXML private Button importer;
+    @FXML private Text fichier;
     @FXML private Button demarrer;
 
     @FXML private TableView<Station> results;
     @FXML private TableColumn<String, String> station;
     @FXML private TableColumn<String, String> action;
 
-    @FXML private CheckBox check1;
-    @FXML private CheckBox check2;
-    @FXML private CheckBox check3;
-    @FXML private Button afficher;
     @FXML private Button exporter;
     @FXML private SplitPane split;
 
@@ -45,35 +43,40 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         demarrer.setDisable(true);
-        afficher.setDisable(true);
         exporter.setDisable(true);
 
 
         importer.setOnAction(event -> {
             final FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(null);
+            int dotIndex = file.getName().lastIndexOf('.');
+            String test =  (dotIndex == -1) ? "" : file.getName().substring(dotIndex + 1);
+            if (test.equals("csv")){
+                stations = parseCSV(file.getAbsolutePath());// on recupere la liste des stations => celles a utiliser par la suite
+                if (!stations.isEmpty()){
+                    fichier.setText(file.getName());
+                    demarrer.setDisable(false);
+                }
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Mauvais Format");
+                alert.setContentText("Vous devez utiliser un fichier au format CSV !");
 
-             stations = parseCSV(file.getAbsolutePath());
-             System.out.println(stations);
-//            if(!file.equals(null)) {
-            demarrer.setDisable(false);
-//            }
+                alert.showAndWait();
+            }
+
         });
 
         // TODO retour de stations a afficher dans le tableau
         station.setCellValueFactory(new PropertyValueFactory<>("name"));
         action.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-
-
-
-
         //recuperer valeur precision
         demarrer.setOnAction(event -> {
             coefNbScenario=precision.getValue()/100;
-            //lancer la simulation
-            //besoin d'une liste de station et solution =>stations
-            afficher.setDisable(false);
+            //lancer ici la simulation avec en parametre les stations
+            //retour : besoin d'une liste de station et solution =>si possible dans la classe stations
             exporter.setDisable(false);
             ObservableList<Station> list = FXCollections.observableArrayList(stations);
             results.setItems(list);
@@ -115,14 +118,24 @@ public class Controller implements Initializable {
             BufferedReader bufRead = new BufferedReader(file);
 
             String line = bufRead.readLine();
-            while (line != null) {
-                String[] array = line.split(",");
-                Station a = new Station(Integer.parseInt(array[0]),array[1],Integer.parseInt(array[2]));
-                listStations.add(a);
+            String[] columns = line.split(",");
+            //skip first line ?
+            if(columns.length!=3){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Mauvais Format");
+                alert.setContentText("Le fichier doit avoir les trois colonnes ID, nom et capacité de la station !");
 
-                line = bufRead.readLine();
+                alert.showAndWait();
+            }else {
+                while (line != null) {
+                    String[] array = line.split(";");
+                    Station a = new Station(Integer.parseInt(array[0]),array[1],Integer.parseInt(array[2]));
+                    listStations.add(a);
+
+                    line = bufRead.readLine();
+                }
             }
-
             bufRead.close();
             file.close();
 
@@ -134,8 +147,9 @@ public class Controller implements Initializable {
 
     public String listToCSV (List<Station> s){
         String result="";
+        result += "Nom;Velos a ajouter\n";
         for (Station st : s){
-            result += st.getName()+","+st.getId()/*+get solution*/;
+            result += st.getName()+","+st.getId()+"\n"/*+get solution*/;
         }
         return result;
     }
