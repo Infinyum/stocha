@@ -1,10 +1,14 @@
 package VLS;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import Model.Recuit;
+import javafx.scene.control.Alert;
 
 public class VLSSolver {
 	public static Double solve(int S, ArrayList<Station> stations) {
@@ -161,5 +165,45 @@ public class VLSSolver {
 		System.out.println(Xfinal);
 		
 		return objFinal;
+	}	
+	
+	public static ArrayList<Station> parseCSV(String fichier) {
+
+        ArrayList<Station> listStations = new ArrayList<Station>();
+        try {
+            FileReader file = new FileReader(fichier);
+            BufferedReader bufRead = new BufferedReader(file);
+
+            String line = bufRead.readLine();
+            String[] columns = line.split(",");
+            //skip first line ?
+            if(columns.length!=3){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Mauvais Format");
+                alert.setContentText("Le fichier doit avoir les trois colonnes ID, nom et capacité de la station !");
+
+                alert.showAndWait();
+            }else {
+                while (line != null) {
+                    String[] array = line.split(",");
+                    Station a = new Station(Integer.parseInt(array[0]),array[1],Integer.parseInt(array[2]));
+                    listStations.add(a);
+
+                    line = bufRead.readLine();
+                }
+            }
+            bufRead.close();
+            file.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return listStations;
+    }
+	
+	public static void main(String[] args) {
+		ArrayList<Station> stations = parseCSV("path");
+		VLSSolver.solve(1, stations);
 	}
 }

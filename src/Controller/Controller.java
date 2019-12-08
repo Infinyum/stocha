@@ -88,31 +88,31 @@ public class Controller implements Initializable {
         exporter.setOnAction(event -> {
             final DirectoryChooser directoryChooser = new DirectoryChooser();
             File dir = directoryChooser.showDialog(null);
-            File filecsv = new File(dir.getAbsolutePath()+"\\results.csv");
-            System.out.println(filecsv.getAbsolutePath());
-
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(filecsv);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+            if (dir != null) {            	
+            	File filecsv = new File(dir.getAbsolutePath()+"\\results.csv");
+            	System.out.println(filecsv.getAbsolutePath());
+            	
+            	FileOutputStream fos = null;
+            	try {
+            		fos = new FileOutputStream(filecsv);
+            	} catch (FileNotFoundException e) {
+            		e.printStackTrace();
+            	}
+            	try {
+            		filecsv.createNewFile();
+            		String toCSV= listToCSV(stations);
+            		fos.write(toCSV.getBytes());
+            		fos.flush();
+            		fos.close();
+            	} catch (IOException e) {
+            		e.printStackTrace();
+            	}
             }
-            try {
-                filecsv.createNewFile();
-                String toCSV= listToCSV(stations);
-                fos.write(toCSV.getBytes());
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
         });
 
     }
 
-    public  ArrayList<Station> parseCSV(String fichier) {
+    public ArrayList<Station> parseCSV(String fichier) {
 
         ArrayList<Station> listStations = new ArrayList<Station>();
         try {

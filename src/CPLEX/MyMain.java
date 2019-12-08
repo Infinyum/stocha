@@ -48,7 +48,7 @@ public class MyMain {
 			List<Station> stations = new ArrayList<>();
 			
 			// Creating the Station objects from the JSON data
-			for (int i = 0; i < 9/*arr.length()*/; i++)
+			for (int i = 0; i < 100/*arr.length()*/; i++)
 			{
 				k = arr.getJSONObject(i).getJSONObject("fields").getInt("nbedock");
 
@@ -59,13 +59,15 @@ public class MyMain {
 			    stations.add(new Station(code, name, k));
 			}
 			
-			ScenarioFactory scenarioFactory = new ScenarioFactory(1, stations);
+			ScenarioFactory scenarioFactory = new ScenarioFactory(50, stations);
 			// Solve for each scenario
-			//for (Map.Entry<Double, Integer[][]> entry : scenarioFactory.getScenarios().entrySet()) {
-			for (Scenario s : scenarioFactory.getScenarios()) {
-				//VLSwithCPLEX.solveMe(stations, s.getDemandMatrix());
-				VLSwithCPLEX.solveMe(myStations, E);
-			}
+			VLSwithCPLEX.solveMe2(stations, scenarioFactory.getScenarios());
+			/*for (Scenario s : scenarioFactory.getScenarios()) {
+				VLSwithCPLEX.solveMe(stations, s.getDemandMatrix());
+				//VLSwithCPLEX.solveMe(myStations, E);
+			}*/
+			
+			
 			
         } catch (IOException e) {
             e.printStackTrace();
