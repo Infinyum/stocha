@@ -71,9 +71,11 @@ public class Controller implements Initializable {
 
         //recuperer valeur precision
         demarrer.setOnAction(event -> {
-            coefNbScenario=precision.getValue()/10;
+            coefNbScenario = precision.getValue()/10;
+            int nbScenarios = (int)Math.round(coefNbScenario);
+            
             //lancer ici la simulation avec en parametre les stations
-            Double valeurFonctionObj = VLSSolver.solve((int)Math.round(coefNbScenario), stations);
+            Double valeurFonctionObj = VLSSolver.solve((nbScenarios == 0 ? 1 : nbScenarios), stations);
             
             // TODO: afficher valeurFonctionObj dans l'IHM
             
