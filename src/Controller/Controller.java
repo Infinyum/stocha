@@ -73,7 +73,10 @@ public class Controller implements Initializable {
         demarrer.setOnAction(event -> {
             coefNbScenario=precision.getValue()/10;
             //lancer ici la simulation avec en parametre les stations
-            stations = VLSSolver.solve((int)Math.round(coefNbScenario), stations);
+            Double valeurFonctionObj = VLSSolver.solve((int)Math.round(coefNbScenario), stations);
+            
+            // TODO: afficher valeurFonctionObj dans l'IHM
+            
             exporter.setDisable(false);
             ObservableList<Station> list = FXCollections.observableArrayList(stations);
             results.setItems(list);

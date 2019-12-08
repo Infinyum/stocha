@@ -16,6 +16,7 @@ public class Station {
 		this.id = id;
 		this.name = name;
 		this.k = k;
+		this.action = -1;
 		
 		// Generate a random double between 0 and 2.0
 		Random r = new Random();

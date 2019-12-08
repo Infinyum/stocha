@@ -7,7 +7,7 @@ import java.util.List;
 import Model.Recuit;
 
 public class VLSSolver {
-	public static ArrayList<Station> solve(int S, ArrayList<Station> stations) {
+	public static Double solve(int S, ArrayList<Station> stations) {
 		// RECUIT SETTINGS
 		//double temperatureInit = 6.4E40d;
 		double temperatureInit = 40d;
@@ -160,6 +160,6 @@ public class VLSSolver {
 		System.out.println("Solution = " + BigDecimal.valueOf(objFinal).setScale(1, RoundingMode.HALF_UP).doubleValue());
 		System.out.println(Xfinal);
 		
-		return stations;
+		return objFinal;
 	}
 }
