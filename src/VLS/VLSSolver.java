@@ -1,26 +1,29 @@
 package VLS;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import Model.Recuit;
 
 public class VLSSolver {
-	public static void solve() throws IOException {
+	public static ArrayList<Station> solve(int S, ArrayList<Station> stations) {
 		// RECUIT SETTINGS
-		double temperatureInit = 6.4E40d;
+		//double temperatureInit = 6.4E40d;
+		double temperatureInit = 40d;
 		double coef = 0.9d;
 		double alpha = 1.1d;
 		double epsilon = 1E-3;
 		int nbIter = 1000;
 		int nbRounds = 10; // Number of times penalty applied
-		int S = 5;
+		int n = stations.size();
+		//int S = 5;
+		
+		// Initialize Xinit
+		List<Integer> Xinit = new ArrayList<>();
+		for (int i = 0 ; i < n ; i++) {
+			Xinit.add((int)Math.round(stations.get(i).getK()/2.0));
+		}
 		
 		
 		// CUSTOM EXAMPLE
@@ -44,7 +47,7 @@ public class VLSSolver {
 		
 		
 		// PARSING JSON DATA
-		String content = "";
+		/*String content = "";
 		content = new String (Files.readAllBytes(Paths.get("dependencies/data.json")));
 		String jsonContent = "{\"data\":" + content + "}"; 
 		JSONObject obj = new JSONObject(jsonContent);
@@ -52,11 +55,11 @@ public class VLSSolver {
 		
 		int code, k;
 		String name;
-		List<Station> stations = new ArrayList<>();
-		List<Integer> Xinit = new ArrayList<>();
+		List<Station> stations = new ArrayList<>();*/
+		
 		
 		// CREATING STATION OBJECTS
-		for (int i = 0; i < 10/*arr.length()*/; i++)
+		/*for (int i = 0; i < arr.length(); i++)
 		{
 			k = arr.getJSONObject(i).getJSONObject("fields").getInt("nbedock");
 			// Initial solution: stations are filled halfway
@@ -67,9 +70,9 @@ public class VLSSolver {
 			name = stationJson.getString("name");
 		    
 		    stations.add(new Station(code, name, k));
-		}
+		}*/
 		
-		int n = stations.size();
+		
 
 		// Penalty variables
 		List<Double> phi = new ArrayList<>();
@@ -140,6 +143,7 @@ public class VLSSolver {
 				temp += s.getProbability() * s.getRecuit().getSolution().get(i);
 			}
 			Xfinal.set(i, (int)Math.round(temp));
+			stations.get(i).setAction(Xfinal.get(i));
 		}
 		
 		Double objFinal = new Double(0d);
@@ -155,9 +159,7 @@ public class VLSSolver {
 		
 		System.out.println("Solution = " + BigDecimal.valueOf(objFinal).setScale(1, RoundingMode.HALF_UP).doubleValue());
 		System.out.println(Xfinal);
-	}
-	
-	public static void main(String[] args) throws IOException {
-		VLSSolver.solve();
+		
+		return stations;
 	}
 }

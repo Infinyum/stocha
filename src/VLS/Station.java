@@ -9,6 +9,7 @@ public class Station {
 	double c;
 	double v;
 	double w;
+	int action;
 	
 	public Station(int id, String name, int k) {
 		super();
@@ -73,6 +74,14 @@ public class Station {
 
 	public void setK(int k) {
 		this.k = k;
+	}
+
+	public void setAction(int action) {
+		this.action = action;
+	}
+
+	public int getAction() {
+		return action;
 	}
 
 	
